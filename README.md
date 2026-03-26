@@ -22,13 +22,14 @@
  * Real-time Data Integration: (선택 사항) 외부 날씨 API를 활용한 손님 방문 빈도 조절
  * Optimization: 
 📂 System Architecture (Draft)
+```mermaid
 graph TD
     A[GameManager] --> B[InputManager]
     A --> C[UI Manager]
     A --> D[Cooking System]
     D --> E[Bungeoppang State: FSM]
     E -->|Update| F[Visual/Sound Feedback]
-
+```
 📝 Documentations
  * GDD (Game Design Document) - 준비 중
  * TDD (Technical Design Document) - 준비 중
