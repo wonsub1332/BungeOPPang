@@ -40,13 +40,30 @@
     *   **`2D Object` -> `Sprites` -> `Square`**를 선택합니다. 이름을 **`Content`**로 변경.
     *   `Inspector`의 `Sprite Renderer` -> `Sprite` 칸은 비워두거나 `batter.png`를 넣어둡니다.
     *   **`Order in Layer`를 `1`로 설정**합니다. (그래야 틀 위에 빵이 보입니다.)
-4.  **스크립트 레퍼런스 연결 (마무리)**:
-    *   `Hierarchy`에서 다시 부모인 **`BungeoSlot_0`**를 선택합니다.
-    *   `Bungeo Slot` 컴포넌트의 빈칸들에 자식들을 드래그해서 넣습니다:
-        *   `Mold Renderer`: 자식인 `Mold`를 드래그.
-        *   `Content Renderer`: 자식인 `Content`를 드래그.
-        *   `Batter Sprite`: `Assets/Sprites/Pastry/batter.png` 연결.
-        *   `Bread Sprite`: `Assets/Sprites/Pastry/bread.png` 연결.
+4.  **스크립트 레퍼런스 연결 (⭐ 가장 중요! ⭐)**:
+    *   `Hierarchy`에서 다시 부모인 **`BungeoSlot_0`**를 마우스로 클릭하여 선택합니다.
+    *   오른쪽 **`Inspector`** 창을 보면 `Bungeo Slot (Script)` 컴포넌트 아래에 비어 있는 칸(None)들이 보일 것입니다.
+    *   **드래그 앤 드롭 연결 순서**:
+        1.  `Hierarchy`에 있는 자식 **`Mold`**를 잡아서 `Bungeo Slot`의 **`Mold Renderer`** 칸에 떨어뜨립니다.
+        2.  `Hierarchy`에 있는 자식 **`Content`**를 잡아서 `Bungeo Slot`의 **`Content Renderer`** 칸에 떨어뜨립니다.
+        3.  `Project` 창(`Assets/Sprites/Pastry/`)에 있는 **`batter.png`**를 잡아서 **`Batter Sprite`** 칸에 떨어뜨립니다.
+        4.  `Project` 창(`Assets/Sprites/Pastry/`)에 있는 **`bread.png`**를 잡아서 **`Bread Sprite`** 칸에 떨어뜨립니다.
+        5.  `Hierarchy`에서 생성한 **`Slider`** 오브젝트를 잡아서 **`Gauge Slider`** 칸에 떨어뜨립니다.
+
+    > **💡 팁: 드래그가 자꾸 풀린다면?**
+    > `BungeoSlot_0`를 선택한 상태에서 `Inspector` 창 오른쪽 상단의 **자물쇠 아이콘(🔒)**을 누르면 창이 고정되어 다른 오브젝트를 드래그하기 훨씬 편해집니다!
+
+    ```text
+    [ Inspector 연결 완성 모습 ]
+    --------------------------------------
+    ▼ Bungeo Slot (Script)
+      Mold Renderer    [Mold (Sprite...)] 🔗 (Hierarchy에서 드래그)
+      Content Renderer [Content (Sprit...)] 🔗 (Hierarchy에서 드래그)
+      Batter Sprite    [batter (Sprite)]  🔗 (Project에서 드래그)
+      Bread Sprite     [bread (Sprite)]   🔗 (Project에서 드래그)
+      Gauge Slider     [Slider (Slider)]  🔗 (Hierarchy에서 드래그)
+    --------------------------------------
+    ```
 
 ### 🟢 월드 스페이스 게이지 바 (UI)
 1.  **Canvas 생성**: `BungeoSlot_0` 오브젝트 위에서 우클릭 -> **`UI` -> `Canvas`** 생성.
