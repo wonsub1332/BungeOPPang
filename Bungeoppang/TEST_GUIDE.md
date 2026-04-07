@@ -23,24 +23,38 @@
 
 ## 🧱 2. 오브젝트(틀) 및 UI 구성
 
-### 🎨 에셋 및 스프라이트 구조
-1.  **부모 오브젝트**: `Hierarchy` 우클릭 -> `Create Empty` (이름: **`BungeoSlot`**).
-    *   **`Box Collider 2D` 추가**: 사이즈를 빵 틀 이미지 크기에 맞게 조절합니다.
-    *   **`Bungeo Slot` 스크립트 추가**: `Assets/Scripts/Core/BungeoSlot.cs` 추가.
-2.  **자식 오브젝트 (이미지)**:
-    *   **`Mold` (틀)**: `Sprite Renderer` 추가, **Order in Layer: 0** 설정. `mold.png` 연결.
-    *   **`Content` (반죽/빵)**: `Sprite Renderer` 추가, **Order in Layer: 1** 설정. (빵이 틀 위에 보여야 함)
-3.  **스크립트 레퍼런스 연결**:
-    *   `BungeoSlot` 인스펙터의 `Mold Renderer`와 `Content Renderer` 칸에 위에서 만든 자식 오브젝트들을 각각 드래그하여 연결합니다.
-    *   `Batter Sprite`와 `Bread Sprite` 칸에 각각의 이미지를 연결합니다.
+### 🎨 붕어빵 슬롯 구조 만들기 (자식 오브젝트 생성 포함)
+하나의 붕어빵 틀은 **부모(로직) + 자식 1(틀 이미지) + 자식 2(빵 이미지)**의 3층 구조로 만듭니다.
+
+1.  **[부모] 로직 오브젝트 생성**: 
+    *   `Hierarchy` 빈 공간 우클릭 -> **`Create Empty`** 클릭. 이름을 **`BungeoSlot_0`**으로 변경.
+    *   `Inspector`에서 `Add Component` -> **`Box Collider 2D`** 추가.
+    *   `Inspector`에서 `Add Component` -> **`Bungeo Slot`** 스크립트 추가.
+2.  **[자식 1] 틀 이미지(Mold) 생성**:
+    *   `Hierarchy`에서 방금 만든 **`BungeoSlot_0` 오브젝트 위에서 우클릭**합니다.
+    *   **`2D Object` -> `Sprites` -> `Square`**를 선택합니다. 이름을 **`Mold`**로 변경. (이렇게 하면 부모 아래로 쏙 들어갑니다.)
+    *   `Inspector`의 `Sprite Renderer` -> `Sprite` 칸에 `mold.png`를 드래그해서 넣습니다.
+    *   **`Order in Layer`를 `0`으로 설정**합니다.
+3.  **[자식 2] 내용물 이미지(Content) 생성**:
+    *   다시 **`BungeoSlot_0` 오브젝트 위에서 우클릭**합니다.
+    *   **`2D Object` -> `Sprites` -> `Square`**를 선택합니다. 이름을 **`Content`**로 변경.
+    *   `Inspector`의 `Sprite Renderer` -> `Sprite` 칸은 비워두거나 `batter.png`를 넣어둡니다.
+    *   **`Order in Layer`를 `1`로 설정**합니다. (그래야 틀 위에 빵이 보입니다.)
+4.  **스크립트 레퍼런스 연결 (마무리)**:
+    *   `Hierarchy`에서 다시 부모인 **`BungeoSlot_0`**를 선택합니다.
+    *   `Bungeo Slot` 컴포넌트의 빈칸들에 자식들을 드래그해서 넣습니다:
+        *   `Mold Renderer`: 자식인 `Mold`를 드래그.
+        *   `Content Renderer`: 자식인 `Content`를 드래그.
+        *   `Batter Sprite`: `Assets/Sprites/Pastry/batter.png` 연결.
+        *   `Bread Sprite`: `Assets/Sprites/Pastry/bread.png` 연결.
 
 ### 🟢 월드 스페이스 게이지 바 (UI)
-1.  **Canvas 생성**: `BungeoSlot`의 자식으로 `UI` -> **`Canvas`** 생성.
+1.  **Canvas 생성**: `BungeoSlot_0` 오브젝트 위에서 우클릭 -> **`UI` -> `Canvas`** 생성.
     *   **Render Mode**: **`World Space`**로 설정.
-    *   **Rect Transform**: `Scale`을 `0.005, 0.005, 0.005` 정도로 대폭 줄이고 빵 틀 위쪽으로 배치합니다.
-2.  **Slider 생성**: `Canvas` 자식으로 `UI` -> **`Slider`** 생성.
-    *   `Handle Slide Area`는 삭제합니다.
-    *   `BungeoSlot` 스크립트의 **`Gauge Slider`** 칸에 이 슬라이더를 연결합니다.
+    *   **Rect Transform**: `Scale`을 `0.005, 0.005, 0.005`로 줄이고 빵 틀 위쪽으로 배치합니다.
+2.  **Slider 생성**: 생성된 `Canvas` 위에서 우클릭 -> **`UI` -> `Slider`** 생성.
+    *   `Handle Slide Area` 자식 오브젝트는 삭제합니다.
+3.  **연결**: 부모 `BungeoSlot_0`를 선택하고, `Bungeo Slot` 스크립트의 **`Gauge Slider`** 칸에 이 슬라이더를 드래그 앤 드롭합니다.
 
 ---
 
@@ -57,11 +71,10 @@
 
 ## 🔍 문제 해결 (Checklist)
 
+*   **Q: 자식 오브젝트가 부모 밖으로 나가요.**
+    *   A: `Hierarchy` 창에서 자식 오브젝트를 마우스로 잡고 부모 오브젝트 이름 위로 드래그하면 다시 자식으로 들어갑니다.
 *   **Q: 클릭했는데 반응이 없어요.**
     *   A1: `Main Camera`에 **`Physics 2D Raycaster`**가 있나요?
-    *   A2: `BungeoSlot` 오브젝트에 **`Box Collider 2D`**가 있고 사이즈가 적절한가요?
-    *   A3: 씬에 **`EventSystem`** 오브젝트가 존재하나요?
+    *   A2: `BungeoSlot_0` 오브젝트에 **`Box Collider 2D`**가 있고 사이즈가 적절한가요?
 *   **Q: 빵 이미지가 틀 뒤에 가려져요.**
-    *   A: `Content` 오브젝트의 `Sprite Renderer` -> **`Order in Layer`** 값을 `Mold`보다 높게(예: 1) 설정하세요.
-*   **Q: 게이지 바가 너무 커서 화면을 다 가려요.**
-    *   A: `Canvas`의 `Scale`을 더 줄이거나(0.001 등), `Slider`의 `Width/Height`를 조절하세요.
+    *   A: `Content` 오브젝트의 `Sprite Renderer` -> **`Order in Layer`** 값이 `Mold`보다 높아야 합니다.
