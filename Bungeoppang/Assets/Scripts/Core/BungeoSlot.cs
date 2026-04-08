@@ -19,6 +19,12 @@ namespace Bungeoppang.Core
         [Tooltip("내용물(반죽/빵) 이미지 (변화)")]
         public SpriteRenderer contentRenderer;
         
+        [Header("Visual Auto-Scaling")]
+        [Tooltip("내용물이 화면에 표시될 가로 크기 (Unity Unit)")]
+        public float targetWidth = 2.5f;
+        [Tooltip("내용물의 추가적인 스케일 보정값")]
+        public Vector3 scaleMultiplier = Vector3.one;
+        
         [Space]
         public Sprite batterSprite; // 반죽 이미지
         public Sprite breadSprite;  // 완성된 빵 이미지
@@ -113,29 +119,42 @@ namespace Bungeoppang.Core
             switch (currentState)
             {
                 case BungeoState.Empty:
-                    contentRenderer.enabled = false; // 빈 틀일 땐 내용물 숨김
+                    contentRenderer.enabled = false;
                     break;
 
                 case BungeoState.Batter:
                     contentRenderer.enabled = true;
                     contentRenderer.sprite = batterSprite;
-                    contentRenderer.color = new Color(1f, 1f, 0.8f); // 흰색 반죽
+                    contentRenderer.color = new Color(1f, 1f, 0.8f);
                     break;
 
                 case BungeoState.Cooking:
                     contentRenderer.sprite = batterSprite;
-                    contentRenderer.color = new Color(1f, 0.8f, 0.4f); // 익어가는 노란색
+                    contentRenderer.color = new Color(1f, 0.8f, 0.4f);
                     break;
 
                 case BungeoState.Perfect:
-                    contentRenderer.sprite = breadSprite; // 이미지 교체: 빵
-                    contentRenderer.color = Color.white;  // 빵 원본 색상
+                    contentRenderer.sprite = breadSprite;
+                    contentRenderer.color = Color.white;
                     break;
 
                 case BungeoState.Burnt:
                     contentRenderer.sprite = breadSprite;
-                    contentRenderer.color = new Color(0.2f, 0.1f, 0.1f); // 탄 색상
+                    contentRenderer.color = new Color(0.2f, 0.1f, 0.1f);
                     break;
+            }
+
+            // 스프라이트 크기에 상관없이 targetWidth에 맞게 localScale 자동 조정
+            if (contentRenderer.enabled && contentRenderer.sprite != null)
+            {
+                float spriteWidth = contentRenderer.sprite.rect.width / contentRenderer.sprite.pixelsPerUnit;
+                if (spriteWidth > 0)
+                {
+                    float calculatedScale = targetWidth / spriteWidth;
+                    contentRenderer.transform.localScale = new Vector3(calculatedScale * scaleMultiplier.x, 
+                                                                     calculatedScale * scaleMultiplier.y, 
+                                                                     1f);
+                }
             }
         }
     }
