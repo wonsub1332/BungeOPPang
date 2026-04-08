@@ -79,6 +79,7 @@ namespace Bungeoppang.Core
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            Debug.Log($"<color=cyan>[BungeoSlot] 클릭 감지됨! 현재 상태: {currentState}</color>");
             if (currentState == BungeoState.Empty) StartCooking();
             else if (currentState == BungeoState.Perfect || currentState == BungeoState.Burnt) Harvest();
         }
