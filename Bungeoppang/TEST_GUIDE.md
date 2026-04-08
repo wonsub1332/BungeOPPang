@@ -1,97 +1,76 @@
 # 🐟 붕어빵 굽기 시스템 테스트 가이드 (Unity 6)
 
-본 문서는 Phase 1의 핵심 굽기 로직(FSM), UI 게이지, 실제 에셋 연동을 Unity 6(6000.4.1f1) 환경에서 완벽하게 테스트하기 위한 가이드입니다.
+본 문서는 Phase 1의 핵심 굽기 로직(FSM), UI 게이지, 실제 에셋 연동 및 **소(팥/슈크림) 넣기 기능**을 Unity 6(6000.4.1f1) 환경에서 완벽하게 테스트하기 위한 가이드입니다.
 
 ---
 
 ## 🛠️ 1. 프로젝트 환경 설정 (최초 1회)
 
 ### 📱 세로 모드(Portrait) 고정
-1.  **Game 창 설정**: 상단 메뉴바 아래 `Game` 탭에서 해상도를 **`1080 x 1920 (9:16)`**으로 변경합니다. (목록에 없다면 `+`를 눌러 추가)
-2.  **빌드 설정 고정**: 
-    *   `Edit` -> `Project Settings` -> `Player` 메뉴로 들어갑니다.
-    *   `Resolution and Presentation` 섹션을 확장합니다.
-    *   **`Orientation`** 항목의 `Default Orientation`을 **`Portrait`**으로 설정합니다.
-    *   `Allowed Orientations for Auto Rotation`에서 Portrait을 제외한 나머지는 체크 해제하여 화면 회전을 방지합니다.
+1.  **Game 창 설정**: 상단 메뉴바 아래 `Game` 탭에서 해상도를 **`1080 x 1920 (9:16)`**으로 변경합니다.
+2.  **빌드 설정 고정**: `Edit` -> `Project Settings` -> `Player` -> `Resolution and Presentation`에서 `Orientation`을 **`Portrait`**으로 설정합니다.
 
 ### 🖱️ 입력 시스템 및 카메라 설정 (클릭 감지 필수)
 1.  **Main Camera**: `Hierarchy`에서 `Main Camera` 선택 후 `Add Component` -> **`Physics 2D Raycaster`**를 추가합니다.
-2.  **EventSystem**: `Hierarchy` 우클릭 -> `UI` -> **`Event System`**을 추가합니다.
-    *   `Inspector`에서 `Replace with InputSystemUIInputModule` 버튼이 보인다면 클릭하여 업데이트합니다.
+2.  **EventSystem**: `Hierarchy` 우클릭 -> `UI` -> **`Event System`**을 추가합니다. (`Replace with InputSystemUIInputModule` 클릭)
 
 ---
 
-## 🧱 2. 오브젝트(틀) 및 UI 구성
+## 🧱 2. 오브젝트 및 UI 구성
 
-### 🎨 붕어빵 슬롯 구조 만들기 (자식 오브젝트 생성 포함)
-하나의 붕어빵 틀은 **부모(로직) + 자식 1(틀 이미지) + 자식 2(빵 이미지)**의 3층 구조로 만듭니다.
+### 🎨 붕어빵 슬롯 구조 (4층 구조)
+하나의 붕어빵 틀은 **부모(로직) + 자식 1(틀) + 자식 2(반죽/빵) + 자식 3(소)** 구조로 만듭니다.
 
-1.  **[부모] 로직 오브젝트 생성**: 
-    *   `Hierarchy` 빈 공간 우클릭 -> **`Create Empty`** 클릭. 이름을 **`BungeoSlot_0`**으로 변경.
-    *   `Inspector`에서 `Add Component` -> **`Box Collider 2D`** 추가.
-    *   `Inspector`에서 `Add Component` -> **`Bungeo Slot`** 스크립트 추가.
-2.  **[자식 1] 틀 이미지(Mold) 생성**:
-    *   `Hierarchy`에서 방금 만든 **`BungeoSlot_0` 오브젝트 위에서 우클릭**합니다.
-    *   **`2D Object` -> `Sprites` -> `Square`**를 선택합니다. 이름을 **`Mold`**로 변경. (이렇게 하면 부모 아래로 쏙 들어갑니다.)
-    *   `Inspector`의 `Sprite Renderer` -> `Sprite` 칸에 `mold.png`를 드래그해서 넣습니다.
-    *   **`Order in Layer`를 `0`으로 설정**합니다.
-3.  **[자식 2] 내용물 이미지(Content) 생성**:
-    *   다시 **`BungeoSlot_0` 오브젝트 위에서 우클릭**합니다.
-    *   **`2D Object` -> `Sprites` -> `Square`**를 선택합니다. 이름을 **`Content`**로 변경.
-    *   `Inspector`의 `Sprite Renderer` -> `Sprite` 칸은 비워두거나 `batter.png`를 넣어둡니다.
-    *   **`Order in Layer`를 `1`로 설정**합니다. (그래야 틀 위에 빵이 보입니다.)
-4.  **스크립트 레퍼런스 연결 (⭐ 가장 중요! ⭐)**:
-    *   `Hierarchy`에서 다시 부모인 **`BungeoSlot_0`**를 마우스로 클릭하여 선택합니다.
-    *   오른쪽 **`Inspector`** 창을 보면 `Bungeo Slot (Script)` 컴포넌트 아래에 비어 있는 칸(None)들이 보일 것입니다.
-    *   **드래그 앤 드롭 연결 순서**:
-        1.  `Hierarchy`에 있는 자식 **`Mold`**를 잡아서 `Bungeo Slot`의 **`Mold Renderer`** 칸에 떨어뜨립니다.
-        2.  `Hierarchy`에 있는 자식 **`Content`**를 잡아서 `Bungeo Slot`의 **`Content Renderer`** 칸에 떨어뜨립니다.
-        3.  `Project` 창(`Assets/Sprites/Pastry/`)에 있는 **`batter.png`**를 잡아서 **`Batter Sprite`** 칸에 떨어뜨립니다.
-        4.  `Project` 창(`Assets/Sprites/Pastry/`)에 있는 **`bread.png`**를 잡아서 **`Bread Sprite`** 칸에 떨어뜨립니다.
-        5.  `Hierarchy`에서 생성한 **`Slider`** 오브젝트를 잡아서 **`Gauge Slider`** 칸에 떨어뜨립니다.
+1.  **[부모] BungeoSlot_0**: 
+    *   `Empty Object` 생성 후 `Box Collider 2D`, `Bungeo Slot` 스크립트 추가.
+2.  **[자식 1] Mold**: `2D Object -> Sprite` 생성. `mold.png` 할당. **`Order in Layer: 0`**.
+3.  **[자식 2] Content**: `2D Object -> Sprite` 생성. **`Order in Layer: 1`**. (반죽 및 완성된 빵 표시)
+4.  **[자식 3] Filling**: `2D Object -> Sprite` 생성. **`Order in Layer: 2`**. (팥/슈크림 소 표시)
 
-    > **💡 팁: 드래그가 자꾸 풀린다면?**
-    > `BungeoSlot_0`를 선택한 상태에서 `Inspector` 창 오른쪽 상단의 **자물쇠 아이콘(🔒)**을 누르면 창이 고정되어 다른 오브젝트를 드래그하기 훨씬 편해집니다!
-
-    ```text
-    [ Inspector 연결 완성 모습 ]
-    --------------------------------------
-    ▼ Bungeo Slot (Script)
-      Mold Renderer    [Mold (Sprite...)] 🔗 (Hierarchy에서 드래그)
-      Content Renderer [Content (Sprit...)] 🔗 (Hierarchy에서 드래그)
-      Batter Sprite    [batter (Sprite)]  🔗 (Project에서 드래그)
-      Bread Sprite     [bread (Sprite)]   🔗 (Project에서 드래그)
-      Gauge Slider     [Slider (Slider)]  🔗 (Hierarchy에서 드래그)
-    --------------------------------------
-    ```
-
-### 🟢 월드 스페이스 게이지 바 (UI)
-1.  **Canvas 생성**: `BungeoSlot_0` 오브젝트 위에서 우클릭 -> **`UI` -> `Canvas`** 생성.
-    *   **Render Mode**: **`World Space`**로 설정.
-    *   **Rect Transform**: `Scale`을 `0.005, 0.005, 0.005`로 줄이고 빵 틀 위쪽으로 배치합니다.
-2.  **Slider 생성**: 생성된 `Canvas` 위에서 우클릭 -> **`UI` -> `Slider`** 생성.
-    *   `Handle Slide Area` 자식 오브젝트는 삭제합니다.
-3.  **연결**: 부모 `BungeoSlot_0`를 선택하고, `Bungeo Slot` 스크립트의 **`Gauge Slider`** 칸에 이 슬라이더를 드래그 앤 드롭합니다.
+### 🔘 소 선택 UI 버튼 (팥/슈크림 선택)
+1.  **Canvas 생성**: `Hierarchy` 우클릭 -> `UI` -> `Canvas` (이름: `FillingUI`).
+2.  **Button 생성**: `Canvas` 아래에 버튼 2개 생성 (`RedBeanBtn`, `CreamBtn`).
+3.  **이벤트 연결 (중요)**:
+    *   각 버튼의 **`On Click()`** 섹션에서 `+` 버튼 클릭.
+    *   **Object**: `BungeoSlot_0` 오브젝트를 드래그하여 할당.
+    *   **Function**: `BungeoSlot` -> **`SelectFilling (int)`** 선택.
+    *   **인자 값(정수)**: 
+        *   팥 버튼: **`1`** 입력
+        *   슈크림 버튼: **`2`** 입력
 
 ---
 
-## 🎮 3. 테스트 시나리오
+## ⚙️ 3. 스크립트 인스펙터 설정 (Reference 연결)
 
-| 액션 | 기대 결과 |
-| :--- | :--- |
-| **틀 클릭** | 회색 틀 위에 **흰색 반죽**이 나타나며 게이지가 차오름. |
-| **대기 (익음)** | 반죽 색상이 노란색으로 변하다가, 어느 순간 **붕어빵 이미지**로 교체됨. |
-| **대기 (탐)** | 붕어빵 이미지가 점점 어두워져 **검은색**이 됨. |
-| **수확 클릭** | 빵과 게이지가 사라지고 콘솔에 `성공` 또는 `실패` 메시지 출력. |
+`BungeoSlot_0`을 선택하고 `Bungeo Slot` 컴포넌트의 빈 칸을 다음과 같이 채웁니다.
+
+| 필드명 | 대상 (드래그 앤 드롭) | 출처 |
+| :--- | :--- | :--- |
+| **Mold Renderer** | `Mold` 오브젝트 | Hierarchy |
+| **Content Renderer** | `Content` 오브젝트 | Hierarchy |
+| **Filling Renderer** | `Filling` 오브젝트 | Hierarchy |
+| **Target Width** | `2.5` (적절히 조절) | - |
+| **Batter Sprite** | `batter.png` | Project |
+| **Bread Sprite** | `bread_nbg.png` | Project |
+| **Red Bean Sprite** | `RedBean_nbg.png` | Project |
+| **Cream Sprite** | `cream_nbg.png` | Project |
+| **Gauge Slider** | `Slider` 오브젝트 | Hierarchy |
 
 ---
 
-## 🔍 문제 해결 (Checklist)
+## 🎮 4. 테스트 시나리오 (소 넣기 포함)
 
-*   **Q: 자식 오브젝트가 부모 밖으로 나가요.**
-    *   A: `Hierarchy` 창에서 자식 오브젝트를 마우스로 잡고 부모 오브젝트 이름 위로 드래그하면 다시 자식으로 들어갑니다.
-*   **Q: 클릭했는데 반응이 없어요.**
-    *   A1: `Main Camera`에 **`Physics 2D Raycaster`**가 있나요?
-    *   A2: `BungeoSlot_0` 오브젝트에 **`Box Collider 2D`**가 있고 사이즈가 적절한가요?
-*   **Q: 빵 이미지가 틀 뒤에 가려져요.**
-    *   A: `Content` 오브젝트의 `Sprite Renderer` -> **`Order in Layer`** 값이 `Mold`보다 높아야 합니다.
+1.  **소 선택**: 화면의 `팥` 또는 `슈크림` 버튼을 누릅니다. (콘솔에 로그 확인)
+2.  **반죽 붓기**: 틀을 **한 번** 클릭합니다. (흰색 반죽 나타남)
+3.  **소 넣기**: 틀을 **한 번 더** 클릭합니다. (반죽 위에 선택한 소 이미지가 나타남)
+4.  **자동 굽기**: 소를 넣으면 자동으로 게이지가 올라가며 굽기가 시작됩니다.
+5.  **수확**: 빵이 노랗게 익었을 때(`Perfect`) 클릭하여 수확합니다. (로그에 종류 확인)
+
+---
+
+## 🔍 문제 해결
+
+*   **Q: 소가 반죽 뒤에 가려져요.**
+    *   A: `Filling` 오브젝트의 `Order in Layer`를 `2`로, `Content`를 `1`로 설정했는지 확인하세요.
+*   **Q: 버튼을 눌러도 소가 안 바뀌어요.**
+    *   A: 버튼의 `On Click` 이벤트에 `SelectFilling` 함수와 숫자(`1` 또는 `2`)가 정확히 입력되었는지 확인하세요.
