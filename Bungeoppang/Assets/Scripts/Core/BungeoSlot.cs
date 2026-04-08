@@ -25,8 +25,10 @@ namespace Bungeoppang.Core
         public SpriteRenderer fillingRenderer;
         
         [Header("Visual Auto-Scaling")]
-        [Tooltip("내용물이 화면에 표시될 가로 크기 (Unity Unit)")]
+        [Tooltip("반죽/빵이 화면에 표시될 가로 크기 (Unity Unit)")]
         public float targetWidth = 2.5f;
+        [Tooltip("소가 화면에 표시될 가로 크기 (Unity Unit)")]
+        public float fillingTargetWidth = 1.2f;
         [Tooltip("내용물의 추가적인 스케일 보정값")]
         public Vector3 scaleMultiplier = Vector3.one;
         
@@ -94,17 +96,21 @@ namespace Bungeoppang.Core
         {
             Debug.Log($"<color=cyan>[BungeoSlot] 클릭됨! 상태: {currentState}, 선택된 소: {selectedFilling}</color>");
             
-            if (currentState == BungeoState.Empty) 
+            switch (currentState)
             {
-                StartCooking();
-            }
-            else if (currentState == BungeoState.Batter)
-            {
-                AddFilling();
-            }
-            else if (currentState == BungeoState.Perfect || currentState == BungeoState.Burnt) 
-            {
-                Harvest();
+                case BungeoState.Empty:
+                    StartCooking(); // 1차 반죽
+                    break;
+                case BungeoState.Batter:
+                    AddFilling();   // 소 넣기
+                    break;
+                case BungeoState.Filling:
+                    CoverWithBatter(); // 2차 반죽 (덮기)
+                    break;
+                case BungeoState.Perfect:
+                case BungeoState.Burnt:
+                    Harvest();      // 수확
+                    break;
             }
         }
 
@@ -113,16 +119,22 @@ namespace Bungeoppang.Core
             timer = 0f;
             currentFilling = BungeoFilling.None;
             TransitionTo(BungeoState.Batter);
-            Debug.Log("<color=white>○ 반죽을 부었습니다!</color>");
+            Debug.Log("<color=white>○ [1단계] 하단 반죽을 부었습니다!</color>");
         }
 
         private void AddFilling()
         {
             currentFilling = selectedFilling;
             TransitionTo(BungeoState.Filling);
-            Debug.Log($"<color=orange>● {currentFilling} 소를 넣었습니다!</color>");
+            Debug.Log($"<color=orange>● [2단계] {currentFilling} 소를 넣었습니다!</color>");
+        }
+
+        private void CoverWithBatter()
+        {
+            TransitionTo(BungeoState.Covering);
+            Debug.Log("<color=white>○ [3단계] 상단 반죽으로 덮었습니다! 굽기 시작.</color>");
             
-            // 소를 넣으면 바로 굽기 시작
+            // 덮으면 잠시 후 바로 굽기 시작
             Invoke(nameof(StartBaking), 0.5f);
         }
 
@@ -173,21 +185,27 @@ namespace Bungeoppang.Core
                 case BungeoState.Filling:
                     contentRenderer.enabled = true;
                     contentRenderer.sprite = batterSprite;
+                    contentRenderer.color = new Color(1f, 1f, 0.8f);
                     ShowFilling();
+                    break;
+
+                case BungeoState.Covering:
+                    contentRenderer.enabled = true;
+                    contentRenderer.sprite = batterSprite;
+                    contentRenderer.color = new Color(1f, 1f, 0.8f);
+                    // 소를 가림 (반죽으로 덮였으므로)
                     break;
 
                 case BungeoState.Cooking:
                     contentRenderer.enabled = true;
                     contentRenderer.sprite = batterSprite;
                     contentRenderer.color = new Color(1f, 0.8f, 0.4f);
-                    ShowFilling();
                     break;
 
                 case BungeoState.Perfect:
                     contentRenderer.enabled = true;
                     contentRenderer.sprite = breadSprite;
                     contentRenderer.color = Color.white;
-                    // 익으면 소는 안보임 (빵 안으로 들어감)
                     break;
 
                 case BungeoState.Burnt:
@@ -197,8 +215,9 @@ namespace Bungeoppang.Core
                     break;
             }
 
-            AutoFixScale(contentRenderer);
-            if (fillingRenderer != null && fillingRenderer.enabled) AutoFixScale(fillingRenderer);
+            AutoFixScale(contentRenderer, targetWidth);
+            if (fillingRenderer != null && fillingRenderer.enabled) 
+                AutoFixScale(fillingRenderer, fillingTargetWidth);
         }
 
         private void ShowFilling()
@@ -211,14 +230,14 @@ namespace Bungeoppang.Core
             else fillingRenderer.enabled = false;
         }
 
-        private void AutoFixScale(SpriteRenderer renderer)
+        private void AutoFixScale(SpriteRenderer renderer, float targetSize)
         {
             if (renderer == null || renderer.sprite == null) return;
             
             float spriteWidth = renderer.sprite.rect.width / renderer.sprite.pixelsPerUnit;
             if (spriteWidth > 0)
             {
-                float calculatedScale = targetWidth / spriteWidth;
+                float calculatedScale = targetSize / spriteWidth;
                 renderer.transform.localScale = new Vector3(calculatedScale * scaleMultiplier.x, 
                                                            calculatedScale * scaleMultiplier.y, 
                                                            1f);
@@ -228,7 +247,6 @@ namespace Bungeoppang.Core
         // 버튼에서 호출할 메서드 (static 변수를 수정하여 모든 슬롯이 공유)
         public void SelectFilling(int fillingIndex)
         {
-            // BungeoFilling enum 순서에 맞게 인덱스 매핑 (None=0, RedBean=1, Cream=2)
             selectedFilling = (BungeoFilling)fillingIndex;
             Debug.Log($"<color=magenta>[BungeoSlot] 소 선택 변경: {selectedFilling}</color>");
         }
