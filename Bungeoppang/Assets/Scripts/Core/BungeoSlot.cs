@@ -225,10 +225,10 @@ namespace Bungeoppang.Core
             }
         }
 
-        // 버튼에서 호출할 정적 메서드
-        public static void SelectFilling(int fillingIndex)
+        // 버튼에서 호출할 메서드 (static 변수를 수정하여 모든 슬롯이 공유)
+        public void SelectFilling(int fillingIndex)
         {
-            // BungeoFilling enum 순서에 맞게 인덱스 매핑 (RedBean=1, Cream=2)
+            // BungeoFilling enum 순서에 맞게 인덱스 매핑 (None=0, RedBean=1, Cream=2)
             selectedFilling = (BungeoFilling)fillingIndex;
             Debug.Log($"<color=magenta>[BungeoSlot] 소 선택 변경: {selectedFilling}</color>");
         }
