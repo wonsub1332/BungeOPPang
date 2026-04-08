@@ -1,6 +1,6 @@
 # 🐟 붕어빵 굽기 시스템 테스트 가이드 (Unity 6)
 
-본 문서는 Phase 1의 핵심 굽기 로직(FSM), UI 게이지, 실제 에셋 연동 및 **현실적인 굽기 과정(반죽-소-반죽)**을 Unity 6(6000.4.1f1) 환경에서 완벽하게 테스트하기 위한 가이드입니다.
+본 문서는 Phase 1의 핵심 굽기 로직(FSM), UI 게이지, 실제 에셋 연동 및 **도구 선택 시스템(반죽/소)**을 Unity 6(6000.4.1f1) 환경에서 완벽하게 테스트하기 위한 가이드입니다.
 
 ---
 
@@ -21,54 +21,45 @@
 ### 🎨 붕어빵 슬롯 구조 (4층 구조)
 하나의 붕어빵 틀은 **부모(로직) + 자식 1(틀) + 자식 2(반죽/빵) + 자식 3(소)** 구조로 만듭니다.
 
-1.  **[부모] BungeoSlot_0**: 
-    *   `Empty Object` 생성 후 `Box Collider 2D`, `Bungeo Slot` 스크립트 추가.
+1.  **[부모] BungeoSlot_0**: `Empty Object` 생성 후 `Box Collider 2D`, `Bungeo Slot` 스크립트 추가.
 2.  **[자식 1] Mold**: `2D Object -> Sprite` 생성. `mold.png` 할당. **`Order in Layer: 0`**.
-3.  **[자식 2] Content**: `2D Object -> Sprite` 생성. **`Order in Layer: 1`**. (반죽 및 완성된 빵 표시)
-4.  **[자식 3] Filling**: `2D Object -> Sprite` 생성. **`Order in Layer: 2`**. (팥/슈크림 소 표시)
+3.  **[자식 2] Content**: `2D Object -> Sprite` 생성. **`Order in Layer: 1`**.
+4.  **[자식 3] Filling**: `2D Object -> Sprite` 생성. **`Order in Layer: 2`**.
 
-### 🔘 소 선택 UI 버튼 설정 (상세 단계)
-1.  **UI 생성**: `Hierarchy` 우클릭 -> `UI` -> `Button` 생성 (`RedBeanBtn`, `CreamBtn`).
+### 🔘 도구 선택 버튼 설정 (반죽/소)
+도구를 먼저 선택해야 틀에 내용물을 채울 수 있습니다.
+
+1.  **버튼 생성**: `Hierarchy` 우클릭 -> `UI` -> `Button` 3개 생성 (`BatterBtn`, `RedBeanBtn`, `CreamBtn`).
 2.  **이벤트 연결**:
-    *   버튼 클릭 -> `Inspector` -> **`On Click ()`** 섹션에서 `+` 클릭.
-    *   **개체 슬롯**: `Hierarchy`에 있는 **`BungeoSlot_0`**을 드래그하여 할당.
-    *   **기능 선택**: **`BungeoSlot` -> `SelectFilling (int)`** 선택.
-    *   **인자 값**: 팥 버튼은 **`1`**, 슈크림 버튼은 **`2`** 입력.
+    *   **BatterBtn (반죽)**:
+        *   `On Click ()` -> `+` 클릭 -> `BungeoSlot_0` 할당.
+        *   Function: **`BungeoSlot -> SelectBatterMode`** 선택.
+    *   **RedBeanBtn (팥)**:
+        *   `On Click ()` -> `+` 클릭 -> `BungeoSlot_0` 할당.
+        *   Function: **`BungeoSlot -> SelectFillingMode (int)`** 선택 -> 인자값 **`1`** 입력.
+    *   **CreamBtn (슈크림)**:
+        *   `On Click ()` -> `+` 클릭 -> `BungeoSlot_0` 할당.
+        *   Function: **`BungeoSlot -> SelectFillingMode (int)`** 선택 -> 인자값 **`2`** 입력.
 
 ---
 
-## ⚙️ 3. 스크립트 인스펙터 설정 (Reference 연결)
+## 🎮 3. 테스트 시나리오 (도구 교체 루프)
 
-`BungeoSlot_0`을 선택하고 `Bungeo Slot` 컴포넌트의 빈 칸을 다음과 같이 채웁니다.
+실제 붕어빵을 굽는 순서대로 도구를 바꿔가며 클릭해야 합니다.
 
-| 필드명 | 대상 (드래그 앤 드롭) | 비고 |
-| :--- | :--- | :--- |
-| **Mold Renderer** | `Mold` 오브젝트 | 틀 배경 |
-| **Content Renderer** | `Content` 오브젝트 | 반죽/빵 렌더러 |
-| **Filling Renderer** | `Filling` 오브젝트 | 소 렌더러 |
-| **Target Width** | `2.5` | 반죽/빵 크기 |
-| **Filling Target Width** | `1.2` | **소 크기 (여기서 조절!)** |
-| **Batter Sprite** | `batter.png` | - |
-| **Bread Sprite** | `bread_nbg.png` | - |
-| **Red Bean Sprite** | `RedBean_nbg.png` | - |
-| **Cream Sprite** | `cream_nbg.png` | - |
-| **Gauge Slider** | `Slider` 오브젝트 | - |
-
----
-
-## 🎮 4. 테스트 시나리오 (3단계 클릭 루프)
-
-1.  **소 선택**: 화면의 `팥` 또는 `슈크림` 버튼을 누릅니다.
-2.  **[1차 클릭] 하단 반죽**: 틀을 클릭하면 흰색 반죽이 채워집니다.
-3.  **[2차 클릭] 소 넣기**: 한 번 더 클릭하면 반죽 위에 **선택한 소**가 나타납니다.
-4.  **[3차 클릭] 상단 반죽**: 한 번 더 클릭하면 반죽이 소를 덮고(소가 안 보임) **굽기 게이지가 시작**됩니다.
-5.  **[수확 클릭] 완벽 타이밍**: 게이지가 차고 빵이 노랗게 익었을 때 클릭하여 수확합니다.
+1.  **반죽 선택**: `반죽 버튼`을 누릅니다.
+2.  **1차 반죽**: 틀을 클릭합니다. (바닥 반죽 채워짐)
+3.  **소 선택**: `팥` 또는 `슈크림` 버튼을 누릅니다.
+4.  **소 넣기**: 틀을 클릭합니다. (**선택한 소 이미지**가 나타남)
+5.  **반죽 선택**: 다시 `반죽 버튼`을 누릅니다.
+6.  **2차 반죽**: 틀을 클릭합니다. (반죽이 소를 덮고 **굽기 게이지 시작**)
+7.  **수확**: 빵이 노랗게 익었을 때 클릭하여 수확합니다.
 
 ---
 
 ## 🔍 문제 해결
 
-*   **Q: 소가 너무 크거나 작아요.**
-    *   A: `BungeoSlot` 컴포넌트의 **`Filling Target Width`** 값을 조절하세요. (추천: 1.0 ~ 1.5)
-*   **Q: 3번 클릭해도 게이지가 안 올라가요.**
-    *   A: 로그에 `[3단계] 상단 반죽으로 덮었습니다!`가 뜨는지 확인하세요. 3차 클릭 전까지는 굽기가 시작되지 않습니다.
+*   **Q: 클릭했는데 "반죽을 먼저 선택해야 합니다!" 경고가 떠요.**
+    *   A: 현재 선택된 도구가 상태와 맞지 않는 것입니다. 화면의 버튼을 눌러 올바른 도구(반죽 주전자 또는 소 국자)를 선택했는지 확인하세요.
+*   **Q: 버튼을 눌러도 반응이 없어요.**
+    *   A: 버튼의 `On Click` 이벤트에 함수가 정확히 연결되었는지 확인하세요. (`SelectBatterMode`는 인자가 없고, `SelectFillingMode`는 숫자가 필요합니다.)
