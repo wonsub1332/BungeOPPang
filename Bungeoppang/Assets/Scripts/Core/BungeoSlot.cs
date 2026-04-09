@@ -44,7 +44,6 @@ namespace Bungeoppang.Core
 
         [Header("UI Reference")]
         public Slider gaugeSlider;
-        public Text stockText; // 상단 재고 표시용 텍스트
 
         [Header("Runtime Status")]
         public BungeoState currentState = BungeoState.Empty;
@@ -61,26 +60,10 @@ namespace Bungeoppang.Core
                 gaugeSlider.maxValue = 1f;
             }
             UpdateVisual();
-            UpdateStockUI();
-
-            // 재고 변경 시 UI 업데이트 구독
-            if (InventoryManager.Instance != null)
-                InventoryManager.Instance.OnInventoryChanged += UpdateStockUI;
         }
 
         private void OnDestroy()
         {
-            if (InventoryManager.Instance != null)
-                InventoryManager.Instance.OnInventoryChanged -= UpdateStockUI;
-        }
-
-        private void UpdateStockUI()
-        {
-            if (stockText != null && InventoryManager.Instance != null)
-            {
-                stockText.text = $"반죽:{InventoryManager.Instance.batterCount} 팥:{InventoryManager.Instance.redBeanCount}";
-                stockText.color = InventoryManager.Instance.batterCount <= 0 ? Color.red : Color.white;
-            }
         }
 
         private void Update()
@@ -179,10 +162,21 @@ namespace Bungeoppang.Core
 
         private void Harvest()
         {
-            string fillingName = currentFilling == BungeoFilling.RedBean ? "팥" : "슈크림";
-            Debug.Log(currentState == BungeoState.Perfect ? 
-                $"<color=yellow>★ {fillingName} 붕어빵 수확! ★</color>" : 
-                $"<color=red>✖ 탄 {fillingName} 붕어빵... ✖</color>");
+            if (currentState == BungeoState.Perfect)
+            {
+                string fillingName = currentFilling == BungeoFilling.RedBean ? "팥" : "슈크림";
+                Debug.Log($"<color=yellow>★ {fillingName} 붕어빵 수확! ★</color>");
+                
+                // 완성품 인벤토리에 추가
+                if (InventoryManager.Instance != null)
+                {
+                    InventoryManager.Instance.AddBungeoppang(currentFilling);
+                }
+            }
+            else
+            {
+                Debug.Log("<color=red>✖ 탄 붕어빵... 버려집니다. ✖</color>");
+            }
             
             TransitionTo(BungeoState.Empty);
             if (gaugeSlider != null) gaugeSlider.gameObject.SetActive(false);

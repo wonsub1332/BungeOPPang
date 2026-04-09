@@ -70,21 +70,22 @@
 
 앞서 만든 붕어빵 틀에 **실시간 재고 표시**와 **전역 UI(골드/보충)**를 연결하는 과정입니다.
 
-### 4.1 붕어빵 틀 위 재고 텍스트 추가
-1.  **Text 생성**: `Hierarchy`에서 `BungeoSlot_0` -> `Canvas`를 우클릭하여 **`UI` -> `Text`** (Legacy)를 추가합니다.
-    *   이름을 **`StockText`**로 변경합니다.
-    *   `Rect Transform`에서 위치를 게이지 바(`Slider`)의 바로 위나 아래로 조정합니다.
-    *   글자 크기를 적절히 줄이고(예: 14~18), 정렬을 중앙으로 맞춥니다.
-2.  **스크립트 연결**: 부모인 **`BungeoSlot_0`**를 선택하고, `Bungeo Slot` 스크립트의 **`Stock Text`** 칸에 방금 만든 `StockText` 오브젝트를 드래그 앤 드롭합니다.
+### 4.1 붕어빵 트레이(Tray) UI 설정
+1.  **Tray Panel 생성**: `Hierarchy`의 `Canvas` 아래에 `Panel`이나 `Empty Object`를 만들고 이름을 **`BungeoTray`**로 변경합니다.
+2.  **재고 텍스트 추가**: `BungeoTray` 자식으로 두 개의 **`UI -> Text`**를 만듭니다.
+    *   **`TrayRedBeanText`**: 완성된 팥 붕어빵 개수 표시용 (예: "x 0")
+    *   **`TrayCreamText`**: 완성된 슈크림 붕어빵 개수 표시용 (예: "x 0")
+3.  **스크립트 연결**: **`Main UI Manager`** 컴포넌트의 `Tray Red Bean Text`와 `Tray Cream Text` 칸에 위에서 만든 텍스트 오브젝트들을 각각 연결합니다.
 
 ### 4.2 전역 매니저(Managers) 구성
 1.  **Manager 오브젝트 생성**: `Hierarchy` 빈 공간 우클릭 -> **`Create Empty`**. 이름을 **`@Managers`**로 변경합니다.
 2.  **컴포넌트 추가**: `@Managers` 오브젝트에 다음 스크립트들을 `Add Component` 합니다.
-    *   **`Inventory Manager`**: 골드와 재료 데이터를 관리합니다. (싱글톤)
-    *   **`Main UI Manager`**: 화면 상/하단 UI(골드, 재고 보충 버튼)를 관리합니다.
+    *   **`Inventory Manager`**: 골드, 원재료 재고, 완성된 붕어빵 재고를 관리합니다. (싱글톤)
+    *   **`Main UI Manager`**: 화면 상/하단 UI 및 트레이 재고 표시를 관리합니다.
 3.  **UI 레퍼런스 연결**: `Main UI Manager` 컴포넌트의 빈 칸들에 실제 UI 오브젝트들을 연결합니다.
-    *   **Top Bar**: `Gold Text` (골드 표시), `Goal Progress Slider` (목표 진행도), `Goal Text` (목표 수치 표시)
-    *   **Refill Buttons**: `Refill Batter Button`, `Refill Red Bean Button`, `Refill Cream Button`을 각각 하단 보충용 버튼 오브젝트와 연결합니다.
+    *   **Top Bar**: `Gold Text`, `Goal Progress Slider`, `Goal Text`
+    *   **Tray UI**: `Tray Red Bean Text`, `Tray Cream Text` (방금 만든 트레이 텍스트들)
+    *   **Bottom Bar**: `Refill Batter Button`, `Refill Red Bean Button`, `Refill Cream Button`
 
 ### 4.3 결과 팝업(Result Popup) 설정
 1.  **Popup 구성**: `Canvas` 아래에 `Panel`을 만들고 이름을 **`ResultPopup`**으로 정합니다.

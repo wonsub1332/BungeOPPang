@@ -18,6 +18,10 @@ namespace Bungeoppang.Core
         public int redBeanCount = 5;
         public int creamCount = 5;
 
+        [Header("Products (Tray)")]
+        public int redBeanBungeoCount = 0;
+        public int creamBungeoCount = 0;
+
         // UI 갱신을 위한 이벤트
         public event Action OnInventoryChanged;
 
@@ -56,6 +60,13 @@ namespace Bungeoppang.Core
             batterCount += batter;
             redBeanCount += redBean;
             creamCount += cream;
+            OnInventoryChanged?.Invoke();
+        }
+
+        public void AddBungeoppang(BungeoFilling filling)
+        {
+            if (filling == BungeoFilling.RedBean) redBeanBungeoCount++;
+            else if (filling == BungeoFilling.Cream) creamBungeoCount++;
             OnInventoryChanged?.Invoke();
         }
     }

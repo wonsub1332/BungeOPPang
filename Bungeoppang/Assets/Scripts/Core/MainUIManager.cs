@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Bungeoppang.Core
 {
     /// <summary>
-    /// 메인 화면의 전역 UI(골드, 목표 진행도, 재료 보충 버튼)를 관리합니다.
+    /// 메인 화면의 전역 UI(골드, 목표 진행도, 재료 보충 버튼, 트레이 재고)를 관리합니다.
     /// </summary>
     public class MainUIManager : MonoBehaviour
     {
@@ -12,6 +12,10 @@ namespace Bungeoppang.Core
         public Text goldText;
         public Slider goalProgressSlider;
         public Text goalText;
+
+        [Header("Tray UI (Completed Products)")]
+        public Text trayRedBeanText;
+        public Text trayCreamText;
 
         [Header("Bottom Bar (Refill Buttons)")]
         public Button refillBatterButton;
@@ -62,9 +66,20 @@ namespace Bungeoppang.Core
 
             if (goldText != null) goldText.text = $"{InventoryManager.Instance.currentGold} G";
             
-            // 목표 진행도 (현재는 예시로 0/20 고정)
-            if (goalProgressSlider != null) goalProgressSlider.value = 0.5f; 
-            if (goalText != null) goalText.text = "0 / 20";
+            // 트레이 재고 업데이트
+            if (trayRedBeanText != null) trayRedBeanText.text = $"x {InventoryManager.Instance.redBeanBungeoCount}";
+            if (trayCreamText != null) trayCreamText.text = $"x {InventoryManager.Instance.creamBungeoCount}";
+
+            // 목표 진행도 (팥 붕어빵 10개 목표 예시)
+            if (goalProgressSlider != null)
+            {
+                float progress = Mathf.Clamp01((float)InventoryManager.Instance.redBeanBungeoCount / 10f);
+                goalProgressSlider.value = progress;
+            }
+            if (goalText != null)
+            {
+                goalText.text = $"{InventoryManager.Instance.redBeanBungeoCount} / 10";
+            }
         }
     }
 }
