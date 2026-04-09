@@ -107,3 +107,35 @@
 3.  **스크립트 추가**: `ResultPopup` 오브젝트에 **`Result Popup UI`** 스크립트를 추가합니다.
 4.  **컴포넌트 연결**: `Result Popup UI`의 각 필드에 위에서 만든 텍스트와 버튼들을 연결합니다.
 5.  **비활성화**: 연결이 끝난 뒤, **`ResultPopup` 오브젝트 자체를 비활성화(Inspector 상단 체크 해제)** 해둡니다.
+
+---
+
+## 📐 5. UI 배치 및 앵커(Anchors) 가이드 (9:16 세로 모드)
+
+UI 요소들이 화면 밖으로 나가지 않도록 `Rect Transform`의 **Anchor Presets**를 다음과 같이 설정하세요. (Alt 키를 누르고 클릭하면 위치까지 자동 이동합니다.)
+
+### 📍 상단 UI (Top Bar)
+*   **`GoldText`**: 
+    *   Anchor: **`Top - Center`**
+    *   Pos Y: `-100`, Width: `800`, Height: `100`
+*   **`GoalSlider` & `GoalText`**:
+    *   Anchor: **`Top - Center`**
+    *   Pos Y: `-250` (GoldText 아래에 배치)
+
+### 🍱 트레이 UI (BungeoTray)
+*   **`BungeoTray` (Panel)**:
+    *   Anchor: **`Top - Right`**
+    *   Pos X: `-50`, Pos Y: `-400`
+    *   자식 텍스트들은 이 Panel 안에서 자유롭게 배치합니다.
+
+### 🛒 하단 UI (Refill Buttons)
+*   **`RefillBtnContainer` (Empty Object)**:
+    *   Anchor: **`Bottom - Center`**
+    *   Pos Y: `200`
+    *   자식 버튼 3개(`Batter`, `RedBean`, `Cream`)를 이 컨테이너 안에 가로로 나란히 배치합니다.
+
+### 🏆 결과 팝업 (ResultPopup)
+*   **`ResultPopup` (Panel)**:
+    *   Anchor: **`Middle - Center` (Stretch-Stretch 추천)**
+    *   Left/Top/Right/Bottom을 모두 `0`으로 하여 화면 전체를 덮게 합니다.
+    *   내부 텍스트와 버튼은 **`Middle - Center`**에 모아서 배치합니다.
