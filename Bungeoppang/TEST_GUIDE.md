@@ -77,20 +77,33 @@
     *   **`TrayCreamText`**: 완성된 슈크림 붕어빵 개수 표시용 (예: "x 0")
 3.  **스크립트 연결**: **`Main UI Manager`** 컴포넌트의 `Tray Red Bean Text`와 `Tray Cream Text` 칸에 위에서 만든 텍스트 오브젝트들을 각각 연결합니다.
 
-### 4.2 전역 매니저(Managers) 구성
+### 4.2 전역 UI 요소 생성 및 매니저 연결
+매니저 스크립트에 연결하기 전, 화면에 표시될 UI 요소들을 먼저 생성해야 합니다.
+
+#### **Step 1: UI 레이아웃 구성 (Canvas 아래)**
+1.  **Top Bar (상단바)**:
+    *   `UI -> Text`: 이름을 **`GoldText`**로 하고 화면 상단에 배치합니다. (예: "1000 G")
+    *   `UI -> Slider`: 이름을 **`GoalSlider`**로 하고 상단바 아래에 배치합니다.
+    *   `UI -> Text`: 이름을 **`GoalText`**로 하고 슬라이더 옆에 배치합니다. (예: "0 / 10")
+2.  **Bottom Bar (보충 버튼)**:
+    *   `UI -> Button` 3개를 생성하여 화면 하단에 나란히 배치합니다.
+    *   이름을 각각 **`RefillBatterBtn`**, **`RefillRedBeanBtn`**, **`RefillCreamBtn`**으로 정합니다.
+
+#### **Step 2: 전역 매니저(Managers) 설정**
 1.  **Manager 오브젝트 생성**: `Hierarchy` 빈 공간 우클릭 -> **`Create Empty`**. 이름을 **`@Managers`**로 변경합니다.
 2.  **컴포넌트 추가**: `@Managers` 오브젝트에 다음 스크립트들을 `Add Component` 합니다.
     *   **`Inventory Manager`**: 골드, 원재료 재고, 완성된 붕어빵 재고를 관리합니다. (싱글톤)
     *   **`Main UI Manager`**: 화면 상/하단 UI 및 트레이 재고 표시를 관리합니다.
-3.  **UI 레퍼런스 연결**: `Main UI Manager` 컴포넌트의 빈 칸들에 실제 UI 오브젝트들을 연결합니다.
-    *   **Top Bar**: `Gold Text`, `Goal Progress Slider`, `Goal Text`
-    *   **Tray UI**: `Tray Red Bean Text`, `Tray Cream Text` (방금 만든 트레이 텍스트들)
-    *   **Bottom Bar**: `Refill Batter Button`, `Refill Red Bean Button`, `Refill Cream Button`
+3.  **UI 레퍼런스 연결**: `Main UI Manager` 컴포넌트의 빈 칸들에 위에서 만든 UI 오브젝트들을 드래그 앤 드롭합니다.
+    *   **Top Bar**: `Gold Text`, `Goal Progress Slider`, `Goal Text` 연결.
+    *   **Tray UI**: `Tray Red Bean Text`, `Tray Cream Text` 연결.
+    *   **Bottom Bar**: `Refill Batter Button`, `Refill Red Bean Button`, `Refill Cream Button` 연결.
 
 ### 4.3 결과 팝업(Result Popup) 설정
 1.  **Popup 구성**: `Canvas` 아래에 `Panel`을 만들고 이름을 **`ResultPopup`**으로 정합니다.
-2.  **스크립트 추가**: `ResultPopup` 오브젝트에 **`Result Popup UI`** 스크립트를 추가합니다.
-3.  **컴포넌트 연결**: `Result Popup UI`의 각 필드에 다음을 연결합니다.
-    *   **Statistics**: `Score Text`, `Perfect Count Text`, `Earned Gold Text`
-    *   **Buttons**: `Restart Button`, `Exit Button`
-4.  **비활성화**: 연결이 끝난 뒤, **`ResultPopup` 오브젝트 자체를 비활성화(Inspector 상단 체크 해제)** 해둡니다. (게임 종료 시 코드가 활성화합니다.)
+2.  **내부 요소 생성**: `ResultPopup` 자식으로 다음을 추가합니다.
+    *   `UI -> Text` 3개: **`ScoreText`**, **`PerfectCountText`**, **`EarnedGoldText`**.
+    *   `UI -> Button` 2개: **`RestartBtn`**, **`ExitBtn`**.
+3.  **스크립트 추가**: `ResultPopup` 오브젝트에 **`Result Popup UI`** 스크립트를 추가합니다.
+4.  **컴포넌트 연결**: `Result Popup UI`의 각 필드에 위에서 만든 텍스트와 버튼들을 연결합니다.
+5.  **비활성화**: 연결이 끝난 뒤, **`ResultPopup` 오브젝트 자체를 비활성화(Inspector 상단 체크 해제)** 해둡니다.
