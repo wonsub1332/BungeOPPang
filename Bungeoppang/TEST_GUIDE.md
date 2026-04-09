@@ -63,3 +63,31 @@
     *   A: 현재 선택된 도구가 상태와 맞지 않는 것입니다. 화면의 버튼을 눌러 올바른 도구(반죽 주전자 또는 소 국자)를 선택했는지 확인하세요.
 *   **Q: 버튼을 눌러도 반응이 없어요.**
     *   A: 버튼의 `On Click` 이벤트에 함수가 정확히 연결되었는지 확인하세요. (`SelectBatterMode`는 인자가 없고, `SelectFillingMode`는 숫자가 필요합니다.)
+
+---
+
+## 🛠️ 4. UI 및 재고 시스템 설정 (Phase 1-3)
+
+앞서 만든 붕어빵 틀에 **실시간 재고 표시**와 **전역 UI(골드/보충)**를 연결하는 과정입니다.
+
+### 4.1 붕어빵 틀 위 재고 텍스트 추가
+1.  **Text 생성**: `Hierarchy`에서 `BungeoSlot_0` -> `Canvas`를 우클릭하여 **`UI` -> `Text - TextMeshPro`** (또는 일반 `Text`)를 추가합니다.
+    *   이름을 **`StockText`**로 변경합니다.
+    *   `Rect Transform`에서 위치를 게이지 바(`Slider`)의 바로 위나 아래로 조정합니다.
+    *   글자 크기를 적절히 줄이고(예: 14~18), 정렬을 중앙으로 맞춥니다.
+2.  **스크립트 연결**: 부모인 **`BungeoSlot_0`**를 선택하고, `Bungeo Slot` 스크립트의 **`Stock Text`** 칸에 방금 만든 `StockText` 오브젝트를 드래그 앤 드롭합니다.
+
+### 4.2 전역 매니저(Managers) 구성
+1.  **Manager 오브젝트 생성**: `Hierarchy` 빈 공간 우클릭 -> **`Create Empty`**. 이름을 **`@Managers`**로 변경합니다.
+2.  **컴포넌트 추가**: `@Managers` 오브젝트에 다음 스크립트들을 `Add Component` 합니다.
+    *   **`Inventory Manager`**: 골드와 재료 데이터를 관리합니다. (싱글톤)
+    *   **`Main UI Manager`**: 화면 상/하단 UI(골드, 재고 보충 버튼)를 관리합니다.
+3.  **UI 레퍼런스 연결**: `Main UI Manager` 컴포넌트의 빈 칸들에 실제 UI 오브젝트들을 연결합니다.
+    *   `Gold Text`: 골드 표시용 텍스트 (UI/Text)
+    *   `Goal Progress Slider`: 오늘의 목표 진행도 슬라이더
+    *   `Refill Buttons`: 하단의 보충 버튼들 (반죽, 팥, 슈크림 버튼 각각 연결)
+
+### 4.3 결과 팝업(Result Popup) 설정
+1.  **Popup 구성**: `Canvas` 아래에 `Panel`을 만들고 이름을 **`ResultPopup`**으로 정합니다.
+2.  **스크립트 추가**: `ResultPopup` 오브젝트에 **`Result Popup UI`** 스크립트를 추가합니다.
+3.  **연결 및 비활성화**: 내부의 점수 텍스트와 버튼들을 스크립트 칸에 연결한 뒤, **`ResultPopup` 오브젝트 자체를 비활성화(Inspector 상단 체크 해제)** 해둡니다. (게임 종료 시 코드가 활성화합니다.)

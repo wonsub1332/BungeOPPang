@@ -44,6 +44,7 @@ namespace Bungeoppang.Core
 
         [Header("UI Reference")]
         public Slider gaugeSlider;
+        public Text stockText; // 상단 재고 표시용 텍스트
 
         [Header("Runtime Status")]
         public BungeoState currentState = BungeoState.Empty;
@@ -60,6 +61,26 @@ namespace Bungeoppang.Core
                 gaugeSlider.maxValue = 1f;
             }
             UpdateVisual();
+            UpdateStockUI();
+
+            // 재고 변경 시 UI 업데이트 구독
+            if (InventoryManager.Instance != null)
+                InventoryManager.Instance.OnInventoryChanged += UpdateStockUI;
+        }
+
+        private void OnDestroy()
+        {
+            if (InventoryManager.Instance != null)
+                InventoryManager.Instance.OnInventoryChanged -= UpdateStockUI;
+        }
+
+        private void UpdateStockUI()
+        {
+            if (stockText != null && InventoryManager.Instance != null)
+            {
+                stockText.text = $"반죽:{InventoryManager.Instance.batterCount} 팥:{InventoryManager.Instance.redBeanCount}";
+                stockText.color = InventoryManager.Instance.batterCount <= 0 ? Color.red : Color.white;
+            }
         }
 
         private void Update()
@@ -124,6 +145,12 @@ namespace Bungeoppang.Core
 
         private void StartCooking()
         {
+            if (InventoryManager.Instance != null && !InventoryManager.Instance.UseBatter())
+            {
+                Debug.LogWarning("<color=red>⚠ 반죽이 부족합니다!</color>");
+                return;
+            }
+
             timer = 0f;
             currentFilling = BungeoFilling.None;
             TransitionTo(BungeoState.Batter);
