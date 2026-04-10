@@ -30,9 +30,9 @@ namespace Bungeoppang.Core
         
         [Header("Visual Auto-Scaling")]
         [Tooltip("반죽/빵이 화면에 표시될 가로 크기 (Unity Unit)")]
-        public float targetWidth = 2.5f;
+        public float targetWidth = 2.0f;
         [Tooltip("소가 화면에 표시될 가로 크기 (Unity Unit)")]
-        public float fillingTargetWidth = 1.2f;
+        public float fillingTargetWidth = 0.9f;
         [Tooltip("내용물의 추가적인 스케일 보정값")]
         public Vector3 scaleMultiplier = Vector3.one;
         
